@@ -1,0 +1,124 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Implementation &#8212; Artifact Detection Tool  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Evaluation" href="Evaluation.html" />
+    <link rel="prev" title="Validation" href="Validation.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="implementation">
+<h1>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h1>
+<p>We currently have explored three different implementations for blur detection. Two of these use different types of variance classifiers. The first uses standard image variance with a given threshold. The other calculates the Laplacian transform of the image, calculates the variance of the transform and classifies based on a given threshold. These implementations are mainly meant as baselines to compare other methods against.
+Most of our time and effort has been spent on our third implementation which is based on the Deepfocus model. This model is also trained on the data used in the Deepfocus paper. This data set is publicly available and is the backbone of our current work. Here is a brief overview of that set.
+The set consists of 204,000 tiles. Each tile is a 64 by 64 resolution color image. These tiles are taken from a variety of different histological slides, including different types of stains. Each tile has a corresponding label from 0 to 10. This label represents how out of focus the tile is. For example, 5 is the ideal focus, 9 is 2 microns over focus, and 1 is 2 microns under focus. These out of focus tiles were imaged with the help of an expert by the Deepfocus authors.
+The Deepfocus authors considered a range of -0.5 micron to +0.5 micron to be “in focus”. We adopted this same assumption, so labels 4,5,6 are considered “in focus” and all others are considered “out of focus”. This makes the problem a binary classification problem. Our model is a convolutional neural network based on the one originally presented in the Deepfocus paper, but with a number of changes.
+A significant change is a difference in software libraries. The original model uses the tflearn library, while ours was written to use keras with Tensorflow. The convolutional block is as follows – 2 convolutional layers, and 3 alternating blocks of convolution and max pooling. Between each of these layers is a batch normalization layer. The result of the final pooling layer is flattened and connected to the dense block. This has alternating dense and dropout layers with batch normalization. The original Deepfocus model used regularization and dropout, but we could not get that model to converge in our testing. Our model does not have regularization, instead of relying on the dropout layers. Another important difference is the optimizer. The original paper used normal stochastic gradient descent, but we found the optimizer Adam to work better in testing.
+Our training methodology is as follows: the first 150,000 images of the dataset were used to train the model and the next 15,000 were used as a test set during training. The rest of the images were reserved as a validation set for the model. Our current best model has ~94% accuracy on the training set and ~89% accuracy on the validation set. So, there is a small amount of overfitting, but the model seems to generalize well.
+We have not been able to move forward with implementing a model for tissue fold detection. This is because we still do not have a labeled data set to work with.</p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Artifact Detection Tool</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Abstraction.html">Abstraction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Validation.html">Validation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Implementation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Evaluation.html">Evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Conclusion.html">Conclusion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="References.html">References</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="Validation.html" title="previous chapter">Validation</a></li>
+      <li>Next: <a href="Evaluation.html" title="next chapter">Evaluation</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, William Maynard, Samuel Appleton, Priya Bablani, Hassam Hussain.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/Implementation.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

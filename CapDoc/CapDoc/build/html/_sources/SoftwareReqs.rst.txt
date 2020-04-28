@@ -1,0 +1,44 @@
+Software Requirements
+=====================
+
+In our project we used the programming language Python, you can find installation instructions at https://www.python.org/downloads/.
+
+We used the following python libraries in our source code, the install commands are listed respectively:
+
+..example-code::
+
+  Matplotlib
+
+  .. code-block:: console
+    python -m pip install -U pip
+    python -m pip install -U matplotlib
+
+  Scikit-learn
+
+  .. code-block:: console
+    pip install -U scikit-learn
+
+  SciPy, NumPy
+
+  .. code-block:: console
+    python -m pip install --user numpy scipy matplotlib ipython jupyter pandas sympy nose
+
+  Tensorflow
+
+  .. code-block:: console
+    pip install tensorflow
+
+  HDF5 for Python
+
+  .. code-block:: console
+    pip install h5py
+
+  OpenCV-Python
+
+  .. code-block:: console
+    pip install opencv-python
+
+Seaborn
+
+.. code-block:: console
+  pip install seaborn
